@@ -1,0 +1,63 @@
+.jumbotron {
+    text-align: center;
+    background-color: black;
+    color: white;
+    border-radius: 0;
+    margin: 0px;
+    padding: 0px;
+    /*border-bottom: 10px solid black;*/
+  }
+
+#example-search-input {
+  margin: 10px 5px 15px 5px;
+}
+
+#search-button {
+  margin: 5px 5px 5px 5px;
+}
+
+#city-search-panel {
+    margin: 5px 5px 5px 5px;
+}
+
+.weatherCard {
+    float: left;
+    width: 135px;
+    height: 200px;
+    background-color: dodgerblue;
+    color: white;
+    margin: 20px;
+    padding-left: 12px;
+}
+
+#city, #temperature, #humidity, #wind-speed, #uv-index {
+    margin-left: 20px;
+}
+
+#jqxLayout {
+    margin-left: 170px;
+    margin-right: 170px;
+}
+
+.ui-overlay-a, .ui-page-theme-a, .ui-page-theme-a .ui-panel-wrapper {
+    background: #fff;
+}
+
+/*@media all and (max-width: 62em) {
+    .my-breakpoint .ui-block-a, .my-breakpoint .ui-block-b {
+        width: 100%;
+        float: none;
+    }
+}
+@media all and (min-width: 72em) {
+    .my-breakpoint .ui-block-a {
+        width: 64.95%;
+    }
+    .my-breakpoint .ui-block-b {
+        width: 34.95%;
+    }
+    #jqxLayout {
+        margin-left: 0x;
+        margin-right: 0px;
+    }
+}*/

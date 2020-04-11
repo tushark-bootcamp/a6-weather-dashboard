@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>jQuery Layout Sample</title>
+    <link
+      rel="stylesheet"
+      href="jquerywidget/jqwidgets/styles/jqx.base.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./weather-db-style.css" />
+    <style type="text/css">
+      .jqx-layout-group-auto-hide-content-vertical {
+        width: 200px;
+      }
+    </style>
+    
+  </head>
+  <body>
+    <header class="jumbotron">
+        <h3 class="display-3">Weather Dashboard</h3>
+      </header>
+    <div id="jqxLayout">
+      <!--autoHideGroup-->
+      <div id="city-search-panel" data-container="SearchCityPanel">
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <div class="input-group-text bg-transparent border-right-0">
+              <i class="fa fa-search"></i>
+            </div>
+          </span>
+          <input
+            class="form-control py-2 border"
+            type="search"
+            value="..."
+            id="example-search-input"
+          />
+          <span class="input-group-append">
+            <button
+              id="search-button"
+              class="btn btn-outline-secondary border"
+              type="button"
+            >
+              Search
+            </button>
+          </span>
+        </div>
+        <div id="citySearchDataTable" class="no-border"></div>
+      </div>
+      <div id = today-weather-pnl data-container="TodaysWeatherPanel">
+        <!--documentGroup-->
+        <h2 id="city">Atlanta (8/15/2019)
+            <img src = "http://openweathermap.org/img/wn/10d@2x.png"></img>
+        </h2>
+        <p id="temperature">Temperature: 90.9 F</p>
+        <p id="humidity">Humidity: 41%</p>
+        <p id="wind-speed">Wind Speed: 4.7 MPH</p>
+        <p id="uv-index">UV Index: 9.49</p>
+      </div>
+      <div data-container="ForecastPanel">
+        <div id = "day-1" class="weatherCard">
+            <p>8/16/2019 </p>
+            <img src = "http://openweathermap.org/img/wn/10d@2x.png"></img>
+            <p>Temp: 90.9 F</p>
+            <p>Humidity: 41%</p>
+        </div>
+        <div id = "day-1" class="weatherCard">
+            <p>8/16/2019 </p>
+            <img src = "http://openweathermap.org/img/wn/10d@2x.png"></img>
+            <p>Temp: 90.9 F</p>
+            <p>Humidity: 41%</p>
+        </div>
+        <div id = "day-1" class="weatherCard">
+            <p>8/16/2019 </p>
+            <img src = "http://openweathermap.org/img/wn/10d@2x.png"></img>
+            <p>Temp: 90.9 F</p>
+            <p>Humidity: 41%</p>
+        </div>
+        <div id = "day-1" class="weatherCard">
+            <p>8/16/2019 </p>
+            <img src = "http://openweathermap.org/img/wn/10d@2x.png"></img>
+            <p>Temp: 90.9 F</p>
+            <p>Humidity: 41%</p>
+        </div>
+        <div id = "day-1" class="weatherCard">
+            <p>8/16/2019 </p>
+            <img src = "http://openweathermap.org/img/wn/10d@2x.png"></img>
+            <p>Temp: 90.9 F</p>
+            <p>Humidity: 41%</p>
+        </div>
+    </div>
+    <script type="text/javascript" src="jquerywidget/scripts/jquery.mobile-1.4.3.min.js"></script>
+    <script
+      type="text/javascript"
+      src="jquerywidget/scripts/jquery-1.11.1.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="jquerywidget/jqwidgets/jqxcore.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="jquerywidget/jqwidgets/jqxdata.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="jquerywidget/jqwidgets/jqxmenu.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="jquerywidget/jqwidgets/jqxdatatable.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="jquerywidget/jqwidgets/jqxbuttons.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="jquerywidget/jqwidgets/jqxscrollbar.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="jquerywidget/jqwidgets/jqxribbon.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="jquerywidget/jqwidgets/jqxlayout.js"
+    ></script>
+    <script src="./moment.js"></script>
+    <script src="./weather-dashboard.js"></script>
+  </body>
+</html>
