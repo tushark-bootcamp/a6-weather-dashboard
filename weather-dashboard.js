@@ -3,6 +3,13 @@
 
 var searchCity = null;
 
+var searchCityHistKey = "searchCityHistory";
+
+var searchCityObj = {
+    id: "",
+    city: "",
+}
+
 var searchCityHistArr = [];
 
 $(document).ready(function () {
@@ -15,7 +22,7 @@ $(document).ready(function () {
         var textSearchCity = $("#city-search-input");
         searchCity = textSearchCity.val();
         alert("Searched sity: " + searchCity);
-        if(searchCity !== null) {
+        if (searchCity !== null) {
             searchCityHistArr.push(searchCity);
             var APIKey = "855bab23d73d71fa68619c46e3e0b133";
 
@@ -26,19 +33,22 @@ $(document).ready(function () {
                 method: "GET"
             }).then(function (todayWeather) {
                 console.log("response: " + JSON.stringify(todayWeather));
-                localStorage.setItem("searchCity-todayWeather", JSON.stringify(todayWeather));
-                renderTodaysWeatherData(todayWeather);
-                
+                if (todayWeather != null) {
+                    updateCitiesTable(searchCity);
+                    $("#today-weather-pnl").empty();
+                    renderTodaysWeatherData(todayWeather);
+
+                    localStorage.setItem("searchCity-todayWeather", JSON.stringify(todayWeather));
+                }
             });
-
             var queryURLForecast = "http://api.openweathermap.org/data/2.5/forecast?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
-
             $.ajax({
                 url: queryURLForecast,
                 method: "GET"
             }).then(function (forecast) {
                 console.log("response: " + JSON.stringify(forecast));
                 localStorage.setItem("searchCity-forecast", JSON.stringify(forecast));
+                $("#forecastPnl").empty();
                 processForecastWeatherData(forecast);
             });
         } else {
@@ -148,29 +158,12 @@ function initDashboard() {
 }
 
 function initCitiesTable() {
+    var searchCityHistArrObj = localStorage.getItem(searchCityHistKey);
+    /*if (searchCityHistArrObj !== null) {
+        alert("searchCityHistArrObj: " + searchCityHistArrObj);
+        searchCityHistArr = JSON.parse(searchCityHistArrObj);
+    }*/
 
-    var data = [
-        {
-            id: "1",
-            city: "Sydney",
-        },
-        {
-            id: "2",
-            city: "Melbourne",
-        },
-        {
-            id: "3",
-            city: "Adelaide",
-        },
-        {
-            id: "4",
-            city: "Perth",
-        },
-        {
-            id: "5",
-            city: "Brisbane",
-        },
-    ];
     // prepare the data
     var source = {
         dataType: "json",
@@ -178,7 +171,7 @@ function initCitiesTable() {
         id: "id",
         // url used when loading data from file
         //url: url,
-        localData: data,
+        localData: searchCityHistArr,
     };
 
     var dataAdapter = new $.jqx.dataAdapter(source);
@@ -200,6 +193,20 @@ function initCitiesTable() {
 
 }
 
+function updateCitiesTable(searchCity) {
+    
+    searchCityObj.id = searchCityHistArr.length == 0 ? 1 : searchCityHistArr.length;
+    searchCityObj.city = searchCity;
+    searchCityHistArr.push(searchCityObj);
+    //alert("pushing in searchCityHistArr: " + searchCityObj.id + " " + searchCityObj.city);
+    
+    $("#citySearchDataTable").jqxDataTable('addRow', null, { city: searchCity }, 'first');
+    
+    alert("New length of searchCityHistArr: " + searchCityHistArr.length);
+
+    localStorage.setItem(searchCityHistKey, searchCityHistArr);
+}
+
 function getTodayDate() {
     var today = new Date();
     //alert("today: " + today);
@@ -215,7 +222,7 @@ function getTodayDate() {
 // This function takes the date in seconds and returns a string date in "dd/mm/YYYY" format 
 function parseDate(dateInSeconds) {
 
-    // 1487246400 is the UTC date time in seconds
+    // 1586973600 is the UTC date time in seconds
     //var dateInSeconds = 1586973600;
     var today = new Date();
     today.setTime(dateInSeconds * 1000);
@@ -259,7 +266,7 @@ function renderTodaysWeatherData(todayWeather) {
 
     var pHumidity = $("<p>");
     pHumidity.attr("id", "humidity");
-    pHumidity.text("Humidity : " + todayWeather.wind.humidity + " %");
+    pHumidity.text("Humidity : " + todayWeather.main.humidity + " %");
     divTodayWthPnl.append(pHumidity);
 
     var wSpeed = $("<p>");
@@ -325,8 +332,13 @@ function processForecastWeatherData(forecast) {
 
 function renderForecastWeather(dayNum, iDate, iconSrc, temp, humidity) {
 
-    var divWeatherCard = $("#" + dayNum);
+    var divForecastPanel = $("#forecastPnl");
+
+    var divWeatherCard = $("<div>");
+    divWeatherCard.attr("id", dayNum);
     divWeatherCard.addClass("weatherCard");
+
+    divForecastPanel.append(divWeatherCard);
 
     var pDate = $("<p>");
     pDate.text(parseDate(iDate));
