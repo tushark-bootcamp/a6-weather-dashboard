@@ -3,6 +3,8 @@
 
 var searchCity = null;
 
+var APIKey = "855bab23d73d71fa68619c46e3e0b133";
+
 var searchCityHistKey = "cityWeather";
 
 var searchCityObj = {
@@ -54,9 +56,6 @@ $(document).ready(function () {
         //alert("Searched sity: " + searchCity);
         if (searchCity !== null) {
             //searchCityHistArr.push(searchCity);
-
-            var APIKey = "855bab23d73d71fa68619c46e3e0b133";
-
             var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
 
             $.ajax({
@@ -67,9 +66,24 @@ $(document).ready(function () {
                 if (todayWeather != null) {
                     searchCityObj.city = searchCity;
                     searchCityObj.todaysWeather = todayWeather;
+
+                    var cityLat = todayWeather.coord.lat;
+                    var cityLon = todayWeather.coord.lon;
+
+                    // Proceed to call API to get UV
+                    var queryUVURL = "http://api.openweathermap.org/data/2.5/uvi?lat=" + cityLat + "&lon=" + cityLon + "&APPID=" + APIKey;
+                    $.ajax({
+                        url: queryUVURL,
+                        method: "GET"
+                    }).then(function (uvResponse) {
+                        console.log("UV response: " + JSON.stringify(uvResponse));
+                        searchCityObj.uvIndex = uvResponse.value;
+                        //alert("UVIndex: " + searchCityObj.uvIndex);
+                    });
+
                     updateCitiesTable(searchCity);
                     $("#today-weather-pnl").empty();
-                    renderTodaysWeatherData(todayWeather);
+                    renderTodaysWeatherData(searchCityObj);
 
                     // Now proceed to get the 5 day forecast
 
@@ -94,7 +108,10 @@ $(document).ready(function () {
             //$("#eventWindow").jqxWindow("open");
         }
     });
+
 });
+
+
 
 function updateSearchCityLocalStorage(searchCityObj) {
     var searchCityLoclHistObj = localStorage.getItem(searchCityHistKey);
@@ -102,18 +119,18 @@ function updateSearchCityLocalStorage(searchCityObj) {
     if (searchCityLoclHistObj !== null) {
         searchCityHistory = JSON.parse(searchCityLoclHistObj);
     }
-    alert("updateSearchCityLocalStorage before size: " + searchCityHistory.listSearchHistory.length);
+    //alert("updateSearchCityLocalStorage before size: " + searchCityHistory.listSearchHistory.length);
     searchCityHistory.listSearchHistory.push(searchCityObj);
-    // Maintain the list of cities separately to render the city search's history table
+    // Maintain the list of cities separately -- helps for a quick diagnostic purposes
     searchCityHistory.listCities.push(searchCityObj.city);
     localStorage.setItem(searchCityHistKey, JSON.stringify(searchCityHistory));
-    alert("updateSearchCityLocalStorage after size: " + searchCityHistory.listSearchHistory.length);
+    //alert("updateSearchCityLocalStorage after size: " + searchCityHistory.listSearchHistory.length);
 }
 
+// Initialises the history of cities previously searched by users.
 function initCitiesTable() {
-    alert("calling initCitiesTable()");
+    //alert("calling initCitiesTable()");
     var searchCityLoclHistObj = localStorage.getItem(searchCityHistKey);
-    //var localStorageSize = searchCityHistory.list.length;
     if (searchCityLoclHistObj !== null) {
         searchCityHistory = JSON.parse(searchCityLoclHistObj);
     }
@@ -122,6 +139,8 @@ function initCitiesTable() {
     var source = {
         dataType: "json",
         dataFields: [{ name: "city", type: "string" }],
+        //sortcolumn: 'city',
+        //sortdirection: 'asc',
         id: "id",
         // url used when loading data from file
         //url: url,
@@ -136,6 +155,7 @@ function initCitiesTable() {
         height: '100%',
         //pageable: true,
         source: dataAdapter,
+        //sortable: true,
         ready: function () {
             $("#citySearchDataTable").jqxDataTable('selectRow', 0);
         },
@@ -146,17 +166,38 @@ function initCitiesTable() {
         }]
     });
 
+    $('#citySearchDataTable').on('rowSelect', function (event) {
+        var selectedDataIndex = event.args.boundIndex;
+        //alert("Selected row dataField: " + selectedDataIndex);
+        loadWeatherData(selectedDataIndex);
+    });
+
 }
-//dataField: 'listSearchHistory.searchCityObj.city',
+
+// Loads the Today's weather info and forecast infor for the row index of selected city
+function loadWeatherData(dataIndex) {
+    var searchCityLoclHistObj = localStorage.getItem(searchCityHistKey);
+    if (searchCityLoclHistObj !== null) {
+        searchCityHistory = JSON.parse(searchCityLoclHistObj);
+        var cityWeathObject = searchCityHistory.listSearchHistory[dataIndex];
+        //loadWeatherData(cityWeathObject);
+        $("#today-weather-pnl").empty();
+        searchCity = cityWeathObject.city;
+        renderTodaysWeatherData(cityWeathObject);
+        $("#forecastPnl").empty();
+        processForecastWeatherData(cityWeathObject.forecast);
+    }
+}
 
 function updateCitiesTable(searchCity) {
-    $("#citySearchDataTable").jqxDataTable('addRow', null, { city: searchCity }, 'first');
+    $("#citySearchDataTable").jqxDataTable('addRow', null, { city: searchCity }, 'last');
 }
 
 function validateSearch() {
     return true;
 }
 
+// Function to initialise the entire weather dashboard
 function initDashboard() {
 
     // the 'layout' JSON array defines the internal structure of the layout
@@ -250,6 +291,7 @@ function initDashboard() {
         contextMenu: true,
     });
     //alert("initDashboardComp");
+    loadWeatherData(0);
 }
 
 
@@ -286,15 +328,11 @@ function getDay(dateInSeconds) {
     return moment(today).date();
 }
 
-
-function getSelectedCity() {
-    return searchCity;
-}
-
-
-function renderTodaysWeatherData(todayWeather) {
+function renderTodaysWeatherData(searchCityObj) {
     var divTodayWthPnl = $("#today-weather-pnl");
-    var city = getSelectedCity();
+    todayWeather = searchCityObj.todaysWeather;
+
+    var city = searchCityObj.city;
     var date = getTodayDate();
 
     var pCity = $("<h2>");
@@ -325,8 +363,13 @@ function renderTodaysWeatherData(todayWeather) {
     uvi.attr("id", "uv-index");
     uvi.text("UV Index : ");
     divTodayWthPnl.append(uvi);
-
-    var uviVal = 9.49;
+    var uviVal = searchCityObj.uvIndex;
+    if (isNaN(uviVal)) {
+        uviVal = 0;
+    } else {
+        uviVal = parseFloat(searchCityObj.uvIndex);
+    }
+    //alert("uviVal: " + uviVal);
     var uvSpan = $("<span>");
     var color = "green";
     var textColor = "black";
