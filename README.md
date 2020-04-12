@@ -1,5 +1,5 @@
 # a6-weather-dashboard
-Weather dashboard app for forecast weekly weather
+Weather dashboard app to forecast weekly weather
 
 This app can be used to search for a city to get today's weather including the UV Index and a forecast for 5 days. 
 
@@ -23,26 +23,13 @@ THEN I am presented with the last searched city forecast
 JQWidgets/HTML/CSS/Javascript/jQuery
 OpenWeatherMap API: For retrieving the weather information for a given city
 JQWidgets (https://www.jqwidgets.com/jquery-widgets-demo/): For a table with scrollable screen and pagination if required.
-Used jqLayout to lay out the dashboard to look it a thoroughly a professionally developed dashboard
+Used jqLayout to lay out the dashboard to achieve a look and feel of a thoroughly a professional dashboard.
 
 ## Screenshots of app
-## Page 1 - Home Page
-![image](https://user-images.githubusercontent.com/60428536/78344908-c703d100-75e8-11ea-8098-ae3e35d08940.png)
+## Page 1 - Initial view before search
+![image](https://github.com/tushark-bootcamp/a6-weather-dashboard/blob/master/Weather%20dashboard%20-view%20before%20search.png)
 
 ## Page 2 - Search Results Page
-Search result for 'cilantro, sweet potato, tomatoes':
-![image](https://user-images.githubusercontent.com/60428536/78345400-59a47000-75e9-11ea-8219-e4bd47b13c76.png)
-
-Search result for 'raspberries, cream cheese':
-![image](https://user-images.githubusercontent.com/60428536/78345611-95d7d080-75e9-11ea-9e06-224712a9bbbd.png)
-
-## Page 3 - Recipe Result Page
-Searched for 'beef mince, cheese, sour cream, avocado' and clicked on search result called 'Spicy mexican stuffed potatoes with beef and cheese':
-
-First part of page, displaying image, some nutritional information, description and allergen information:
-![image](https://user-images.githubusercontent.com/60428536/78345822-e6e7c480-75e9-11ea-8484-2c2bd897fdda.png)
-
-Second part of page, displaying ingredients and instructions:
-![image](https://user-images.githubusercontent.com/60428536/78346099-4645d480-75ea-11ea-952b-2cff7288384e.png)
+![image](https://github.com/tushark-bootcamp/a6-weather-dashboard/blob/master/Weather%20dashboard%20-Historical%20search%20data.png)
 
 
