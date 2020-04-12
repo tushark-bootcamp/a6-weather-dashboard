@@ -177,13 +177,11 @@ function loadWeatherData(dataIndex) {
     var searchCityLoclHistObj = localStorage.getItem(searchCityHistKey);
     if (searchCityLoclHistObj !== null) {
         searchCityHistory = JSON.parse(searchCityLoclHistObj);
-        var cityWeathObject = searchCityHistory.listSearchHistory[dataIndex];
-        //loadWeatherData(cityWeathObject);
+        var searchCityObj = searchCityHistory.listSearchHistory[dataIndex];
         $("#today-weather-pnl").empty();
-        searchCity = cityWeathObject.city;
-        renderTodaysWeatherData(cityWeathObject);
+        renderTodaysWeatherData(searchCityObj);
         $("#forecastPnl").empty();
-        processForecastWeatherData(cityWeathObject.forecast);
+        processForecastWeatherData(searchCityObj.forecast);
     }
 }
 
