@@ -56,7 +56,7 @@ $(document).ready(function () {
         //alert("Searched sity: " + searchCity);
         if (searchCity !== null) {
             //searchCityHistArr.push(searchCity);
-            var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
 
             $.ajax({
                 url: queryURL,
@@ -71,7 +71,8 @@ $(document).ready(function () {
                     var cityLon = todayWeather.coord.lon;
 
                     // Proceed to call API to get UV
-                    var queryUVURL = "http://api.openweathermap.org/data/2.5/uvi?lat=" + cityLat + "&lon=" + cityLon + "&APPID=" + APIKey;
+                    var queryUVURL = "https://api.openweathermap.org/data/2.5/uvi?lat=" + cityLat + "&lon=" + cityLon + "&APPID=" + APIKey;
+                    //var queryUVURL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + cityLat + "&lon=" + cityLon + "&APPID=" + APIKey;
                     $.ajax({
                         url: queryUVURL,
                         method: "GET"
@@ -79,15 +80,12 @@ $(document).ready(function () {
                         console.log("UV response: " + JSON.stringify(uvResponse));
                         searchCityObj.uvIndex = uvResponse.value;
                         //alert("UVIndex: " + searchCityObj.uvIndex);
+                        updateCitiesTable(searchCity);
+                        $("#today-weather-pnl").empty();
+                        renderTodaysWeatherData(searchCityObj);
                     });
-
-                    updateCitiesTable(searchCity);
-                    $("#today-weather-pnl").empty();
-                    renderTodaysWeatherData(searchCityObj);
-
                     // Now proceed to get the 5 day forecast
-
-                    var queryURLForecast = "http://api.openweathermap.org/data/2.5/forecast?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
+                    var queryURLForecast = "https://api.openweathermap.org/data/2.5/forecast?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
                     $.ajax({
                         url: queryURLForecast,
                         method: "GET"
@@ -373,12 +371,13 @@ function renderTodaysWeatherData(searchCityObj) {
     var uvSpan = $("<span>");
     var color = "green";
     var textColor = "black";
-    if (uviVal < 2) {
+    if (uviVal < 3.0) {
         //uvSpan.attr("style", "background-color: green");
         color = "green";
-    } else if (uviVal < 7) {
+    } else if (uviVal < 7.0) {
         //uvSpan.attr("style", "background-color: amber");
-        color = "amber";
+        color = "orange";
+        textColor = "white";
     } else {
         //uvSpan.attr("style", "background-color: red, color: white");
         color = "red";
