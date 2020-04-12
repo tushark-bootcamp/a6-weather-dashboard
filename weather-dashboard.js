@@ -361,10 +361,8 @@ function renderTodaysWeatherData(searchCityObj) {
     uvi.attr("id", "uv-index");
     uvi.text("UV Index : ");
     divTodayWthPnl.append(uvi);
-    var uviVal = searchCityObj.uvIndex;
-    if (isNaN(uviVal)) {
-        uviVal = 0;
-    } else {
+    var uviVal = 0.0;
+    if (!isNaN(searchCityObj.uvIndex)) {
         uviVal = parseFloat(searchCityObj.uvIndex);
     }
     //alert("uviVal: " + uviVal);
