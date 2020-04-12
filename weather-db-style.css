@@ -8,7 +8,7 @@
     /*border-bottom: 10px solid black;*/
   }
 
-#example-search-input {
+#city-search-input {
   margin: 10px 5px 15px 5px;
 }
 
@@ -35,7 +35,7 @@
 }
 
 #jqxLayout {
-    margin-left: 170px;
+    margin-left: 130px;
     margin-right: 170px;
 }
 

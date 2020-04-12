@@ -3,14 +3,44 @@
 
 var searchCity = null;
 
-var searchCityHistKey = "searchCityHistory";
+var searchCityHistKey = "cityWeather";
 
 var searchCityObj = {
-    id: "",
-    city: "",
+    "city": "",
+    "todaysWeather": "",
+    "uvIndex": "",
+    "forecast": ""
 }
 
-var searchCityHistArr = [];
+// Maintain the list of cities separately to render the city search's history table
+var searchCityHistory = {
+    "title": "weatherSearchHistory",
+    "listSearchHistory": [],
+    "listCities": []
+}
+
+/* To demonstrates how the searchCityHistory JSON looks like 
+var searchCityHistory = {
+    "title": "weatherSearchHistory",
+    "listSearchHistory": [
+        {
+            "searchCityObj": searchCityObj1
+        },
+        {
+            "searchCityObj": searchCityObj2
+        }
+    ],
+    "listCities": [
+        {
+            "city": Sydney
+        },
+        {
+            "city": Melbourne
+        }
+    ]
+}*/
+
+//var searchCityHistArr = [];
 
 $(document).ready(function () {
     initDashboard();
@@ -18,12 +48,13 @@ $(document).ready(function () {
 
     $("#search-button").on("click", function () {
         event.preventDefault();
-        alert("click on search-button");
+        //alert("click on search-button");
         var textSearchCity = $("#city-search-input");
         searchCity = textSearchCity.val();
-        alert("Searched sity: " + searchCity);
+        //alert("Searched sity: " + searchCity);
         if (searchCity !== null) {
-            searchCityHistArr.push(searchCity);
+            //searchCityHistArr.push(searchCity);
+
             var APIKey = "855bab23d73d71fa68619c46e3e0b133";
 
             var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
@@ -34,29 +65,93 @@ $(document).ready(function () {
             }).then(function (todayWeather) {
                 console.log("response: " + JSON.stringify(todayWeather));
                 if (todayWeather != null) {
+                    searchCityObj.city = searchCity;
+                    searchCityObj.todaysWeather = todayWeather;
                     updateCitiesTable(searchCity);
                     $("#today-weather-pnl").empty();
                     renderTodaysWeatherData(todayWeather);
 
-                    localStorage.setItem("searchCity-todayWeather", JSON.stringify(todayWeather));
+                    // Now proceed to get the 5 day forecast
+
+                    var queryURLForecast = "http://api.openweathermap.org/data/2.5/forecast?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
+                    $.ajax({
+                        url: queryURLForecast,
+                        method: "GET"
+                    }).then(function (forecast) {
+                        console.log("response: " + JSON.stringify(forecast));
+                        searchCityObj.forecast = forecast;
+                        updateSearchCityLocalStorage(searchCityObj);
+                        $("#forecastPnl").empty();
+                        processForecastWeatherData(forecast);
+                    });
+                } else {
+                    alert("The city cannot be found by our search engine; please try searching another city!!");
                 }
             });
-            var queryURLForecast = "http://api.openweathermap.org/data/2.5/forecast?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
-            $.ajax({
-                url: queryURLForecast,
-                method: "GET"
-            }).then(function (forecast) {
-                console.log("response: " + JSON.stringify(forecast));
-                localStorage.setItem("searchCity-forecast", JSON.stringify(forecast));
-                $("#forecastPnl").empty();
-                processForecastWeatherData(forecast);
-            });
+
         } else {
             alert("Please enter city to search today's weather!!");
             //$("#eventWindow").jqxWindow("open");
         }
     });
 });
+
+function updateSearchCityLocalStorage(searchCityObj) {
+    var searchCityLoclHistObj = localStorage.getItem(searchCityHistKey);
+    //var localStorageSize = searchCityHistory.list.length;
+    if (searchCityLoclHistObj !== null) {
+        searchCityHistory = JSON.parse(searchCityLoclHistObj);
+    }
+    alert("updateSearchCityLocalStorage before size: " + searchCityHistory.listSearchHistory.length);
+    searchCityHistory.listSearchHistory.push(searchCityObj);
+    // Maintain the list of cities separately to render the city search's history table
+    searchCityHistory.listCities.push(searchCityObj.city);
+    localStorage.setItem(searchCityHistKey, JSON.stringify(searchCityHistory));
+    alert("updateSearchCityLocalStorage after size: " + searchCityHistory.listSearchHistory.length);
+}
+
+function initCitiesTable() {
+    alert("calling initCitiesTable()");
+    var searchCityLoclHistObj = localStorage.getItem(searchCityHistKey);
+    //var localStorageSize = searchCityHistory.list.length;
+    if (searchCityLoclHistObj !== null) {
+        searchCityHistory = JSON.parse(searchCityLoclHistObj);
+    }
+
+    // prepare the data
+    var source = {
+        dataType: "json",
+        dataFields: [{ name: "city", type: "string" }],
+        id: "id",
+        // url used when loading data from file
+        //url: url,
+        //localData: searchCityHistArr,
+        localData: searchCityHistory.listSearchHistory
+    };
+
+    var dataAdapter = new $.jqx.dataAdapter(source);
+
+    $("#citySearchDataTable").jqxDataTable({
+        width: '100%',
+        height: '100%',
+        //pageable: true,
+        source: dataAdapter,
+        ready: function () {
+            $("#citySearchDataTable").jqxDataTable('selectRow', 0);
+        },
+        columns: [{
+            text: 'City',
+            dataField: 'city',
+            width: '100%'
+        }]
+    });
+
+}
+//dataField: 'listSearchHistory.searchCityObj.city',
+
+function updateCitiesTable(searchCity) {
+    $("#citySearchDataTable").jqxDataTable('addRow', null, { city: searchCity }, 'first');
+}
 
 function validateSearch() {
     return true;
@@ -147,65 +242,17 @@ function initDashboard() {
         },
     ];
     $("#jqxLayout").jqxLayout({
-        width: 1300,
+        width: 1250,
         //width: '100%',
         //width: getWidth("layout"),
-        height: 680,
+        height: 650,
         layout: layout,
         contextMenu: true,
     });
     //alert("initDashboardComp");
 }
 
-function initCitiesTable() {
-    var searchCityHistArrObj = localStorage.getItem(searchCityHistKey);
-    /*if (searchCityHistArrObj !== null) {
-        alert("searchCityHistArrObj: " + searchCityHistArrObj);
-        searchCityHistArr = JSON.parse(searchCityHistArrObj);
-    }*/
 
-    // prepare the data
-    var source = {
-        dataType: "json",
-        dataFields: [{ name: "city", type: "string" }],
-        id: "id",
-        // url used when loading data from file
-        //url: url,
-        localData: searchCityHistArr,
-    };
-
-    var dataAdapter = new $.jqx.dataAdapter(source);
-
-    $("#citySearchDataTable").jqxDataTable({
-        width: '100%',
-        height: '100%',
-        //pageable: true,
-        source: dataAdapter,
-        ready: function () {
-            $("#citySearchDataTable").jqxDataTable('selectRow', 0);
-        },
-        columns: [{
-            text: 'City',
-            dataField: 'city',
-            width: '100%'
-        }]
-    });
-
-}
-
-function updateCitiesTable(searchCity) {
-    
-    searchCityObj.id = searchCityHistArr.length == 0 ? 1 : searchCityHistArr.length;
-    searchCityObj.city = searchCity;
-    searchCityHistArr.push(searchCityObj);
-    //alert("pushing in searchCityHistArr: " + searchCityObj.id + " " + searchCityObj.city);
-    
-    $("#citySearchDataTable").jqxDataTable('addRow', null, { city: searchCity }, 'first');
-    
-    alert("New length of searchCityHistArr: " + searchCityHistArr.length);
-
-    localStorage.setItem(searchCityHistKey, searchCityHistArr);
-}
 
 function getTodayDate() {
     var today = new Date();
