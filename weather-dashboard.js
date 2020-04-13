@@ -80,7 +80,6 @@ $(document).ready(function () {
                         console.log("UV response: " + JSON.stringify(uvResponse));
                         searchCityObj.uvIndex = uvResponse.value;
                         //alert("UVIndex: " + searchCityObj.uvIndex);
-                        updateCitiesTable(searchCity);
                         $("#today-weather-pnl").empty();
                         renderTodaysWeatherData(searchCityObj);
                         // Now proceed to get the 5 day forecast
@@ -96,6 +95,7 @@ $(document).ready(function () {
                             updateSearchCityLocalStorage(searchCityObj);
                             $("#forecastPnl").empty();
                             processForecastWeatherData(forecast);
+                            updateCitiesTable(searchCityObj.city);
                         });
                     });
 
@@ -169,7 +169,9 @@ function initCitiesTable() {
 
     $('#citySearchDataTable').on('rowSelect', function (event) {
         var selectedDataIndex = event.args.boundIndex;
-        //alert("Selected row dataField: " + selectedDataIndex);
+        //var columntext = $("#citySearchDataTable").jqxDataTable('getcolumn', event.args.datafield).text;
+        //alert("Selected row dataField: " + columntext);
+        //alert("Selected row dataIndex: " + selectedDataIndex);
         loadWeatherData(selectedDataIndex);
     });
 
@@ -188,9 +190,16 @@ function loadWeatherData(dataIndex) {
     }
 }
 
+// Update the cities table with the latest search result, select the row and ensure it is visible
 function updateCitiesTable(searchCity) {
     $("#citySearchDataTable").jqxDataTable('addRow', null, { city: searchCity }, 'last');
+    $("#citySearchDataTable").jqxDataTable('clearSelection');
+    var lastRow = $("#citySearchDataTable").jqxDataTable('getRows').length;
+    //alert("lastRow: " + lastRow);
+    $("#citySearchDataTable").jqxDataTable('ensureRowVisible', lastRow - 1);
+    $('#citySearchDataTable').jqxDataTable('selectRow', lastRow - 1);
 }
+
 
 function validateSearch() {
     return true;
@@ -475,4 +484,13 @@ function getTime(dateTime) {
 // This function is not used as we have used unit of measurement as imperial
 function convertKelvinToFahrenheit(kelvin) {
     return ((kelvin - 273.15) * 9 / 5 + 32).toFixed(2);
+}
+
+function unselectRows() {
+    var selection = $("#citySearchDataTable").jqxDataTable('getSelection');
+    for (var i = 0; i < selection.length; i++) {
+        // get a selected row.
+        $('#citySearchDataTable').jqxDataTable('selectRow', lastRow - 1);
+        var rowData = selection[i];
+    }
 }
