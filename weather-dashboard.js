@@ -83,19 +83,22 @@ $(document).ready(function () {
                         updateCitiesTable(searchCity);
                         $("#today-weather-pnl").empty();
                         renderTodaysWeatherData(searchCityObj);
+                        // Now proceed to get the 5 day forecast
+                        // It is important the API call to retrieve forecast is also placed within the "then(function) of UV API call"
+                        // this approach ensures the UV value gets set in the searchCityObj object
+                        var queryURLForecast = "https://api.openweathermap.org/data/2.5/forecast?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
+                        $.ajax({
+                            url: queryURLForecast,
+                            method: "GET"
+                        }).then(function (forecast) {
+                            console.log("response: " + JSON.stringify(forecast));
+                            searchCityObj.forecast = forecast;
+                            updateSearchCityLocalStorage(searchCityObj);
+                            $("#forecastPnl").empty();
+                            processForecastWeatherData(forecast);
+                        });
                     });
-                    // Now proceed to get the 5 day forecast
-                    var queryURLForecast = "https://api.openweathermap.org/data/2.5/forecast?q=" + searchCity + "&units=imperial&APPID=" + APIKey;
-                    $.ajax({
-                        url: queryURLForecast,
-                        method: "GET"
-                    }).then(function (forecast) {
-                        console.log("response: " + JSON.stringify(forecast));
-                        searchCityObj.forecast = forecast;
-                        updateSearchCityLocalStorage(searchCityObj);
-                        $("#forecastPnl").empty();
-                        processForecastWeatherData(forecast);
-                    });
+
                 } else {
                     alert("The city cannot be found by our search engine; please try searching another city!!");
                 }
@@ -359,30 +362,35 @@ function renderTodaysWeatherData(searchCityObj) {
     uvi.attr("id", "uv-index");
     uvi.text("UV Index : ");
     divTodayWthPnl.append(uvi);
-    var uviVal = 0.0;
-    if (!isNaN(searchCityObj.uvIndex)) {
-        uviVal = parseFloat(searchCityObj.uvIndex);
+
+    //if (!searchCityObj.uvIndex === "" && !isNaN(searchCityObj.uvIndex)) {
+
+    var uviText = searchCityObj.uvIndex;
+    //alert("searchCityObj.uvIndex : " + uviText);
+    // Only render the special color code if the API has returned a valid value for UV Index
+    if (uviText !== "") {
+        //alert("uviVal is !NaN : " + uviText);
+        var uviVal = parseFloat(uviText);
+        var uvSpan = $("<span>");
+        var color = "green";
+        var textColor = "black";
+        if (uviVal < 3.0) {
+            //uvSpan.attr("style", "background-color: green");
+            color = "green";
+        } else if (uviVal < 7.0) {
+            //uvSpan.attr("style", "background-color: amber");
+            color = "orange";
+            textColor = "white";
+        } else {
+            //uvSpan.attr("style", "background-color: red, color: white");
+            color = "red";
+            textColor = "white";
+        }
+        uvSpan.css('color', textColor);
+        uvSpan.css('background-color', color);
+        uvSpan.text(uviVal);
+        uvi.append(uvSpan);
     }
-    //alert("uviVal: " + uviVal);
-    var uvSpan = $("<span>");
-    var color = "green";
-    var textColor = "black";
-    if (uviVal < 3.0) {
-        //uvSpan.attr("style", "background-color: green");
-        color = "green";
-    } else if (uviVal < 7.0) {
-        //uvSpan.attr("style", "background-color: amber");
-        color = "orange";
-        textColor = "white";
-    } else {
-        //uvSpan.attr("style", "background-color: red, color: white");
-        color = "red";
-        textColor = "white";
-    }
-    uvSpan.css('color', textColor);
-    uvSpan.css('background-color', color);
-    uvSpan.text(uviVal);
-    uvi.append(uvSpan);
 }
 
 function processForecastWeatherData(forecast) {
